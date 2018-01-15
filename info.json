@@ -17,7 +17,7 @@
                     "len":17,
                     "mtdofs":9961472,
                     "mtdnum":2,
-                    "name":"dtb"
+                    "name":"devicetree.dtb"
                 }
             ]
         }

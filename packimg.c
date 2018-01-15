@@ -193,7 +193,7 @@ int pack_img(const char *name, const unsigned int seek_len, const unsigned int l
 
     sprintf(cmd, "dd if=%s of=test.bin bs=1k seek=%d count=%d", name, seek_len, len);
 
-    // printf("[system]:%s\n", cmd);
+    printf("[system]:%s\n", cmd);
 
     system(cmd);
 
@@ -211,29 +211,43 @@ int unpack_img(char *name, unsigned int len, unsigned int skip_len)
     return 0;
 }
 
-int calc_seek_len(const char *name, const img_info *info)
+int calc_seek_len(const char *name, const img_info info)
 {
     unsigned int len = 0;
     unsigned int seek_len = 0;
 
-    // printf("name:%s\n", info->kernel_info->name);
+    // printf("name:%s, len:%d\n", info.kernel_info->name, info->kernel_info->len);
 
     if(strcmp(name, "uImage") == 0)
     {
-        len = info->kernel_info->len;
+        len = info.kernel_info->len;
 
         seek_len = 0;
     }
-    else if(strcmp(name, "dtb") == 0)
+    else if(strcmp(name, "devicetree.dtb") == 0)
     {
-        len = info->dts_info->len;
+        len = info.dts_info->len;
 
-        seek_len = info->kernel_info->len;
+        seek_len = info.kernel_info->len;
     }
 
     printf("len:%d, seek_len:%d\n", len, seek_len);
 
     pack_img(name, seek_len, len);
+
+    return 0;
+}
+
+int choose_to_pack(const img_info info)
+{
+    if(info.kernel_info->len != 0)
+    {
+        calc_seek_len("uImage", info);
+    }
+    if(info.dts_info->len != 0)
+    {
+        calc_seek_len("devicetree.dtb", info);
+    }
 
     return 0;
 }
@@ -277,7 +291,7 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    calc_seek_len("uImage", &info);
+    choose_to_pack(info);
 
     return 0;
 }
