@@ -52,3 +52,48 @@ int choose_to_unpack(const img_info *info)
 
     return 0;
 }
+
+int update_dev(const char *name, const int mtdnum)
+{
+    char cmd[128];
+
+    sprintf(cmd, "nandflash eraseall /dev/mtd%d", mtdnum);
+
+    printf("[system] %s\n", cmd);
+
+    system(cmd);
+
+    sprintf(cmd, "nandwrite /dev/mtd%d -p %s", mtdnum, name);
+
+    printf("[system] %s\n", cmd);
+
+    system(cmd);
+
+    return 0;
+}
+
+int choose_to_update(const img_info *info)
+{
+    unsigned int mtdnum = 0;
+    char *name = NULL;
+
+    if(info->kernel_info->len != 0)
+    {
+        mtdnum = info->kernel_info->mtdnum;
+        name = info->kernel_info->name;
+
+        update_dev(name, mtdnum);
+    }
+
+    if(info->dts_info->len != 0)
+    {
+        mtdnum = info->dts_info->mtdnum;
+        name = info->dts_info->name;
+
+        update_dev(name, mtdnum);
+    }
+
+    return 0;
+}
+
+
