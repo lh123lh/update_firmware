@@ -1,0 +1,25 @@
+{
+    "info":[
+        {
+            "kernel":[
+                {
+                    "offset":1,
+                    "len":3796,
+                    "mtdofs":5242880,
+                    "mtdnum":3,
+                    "name":"uImage"
+                }
+            ],
+
+            "device_tree":[
+                {
+                    "offset":3797,
+                    "len":17,
+                    "mtdofs":9961472,
+                    "mtdnum":2,
+                    "name":"devicetree.dtb"
+                }
+            ]
+        }
+    ]
+}
