@@ -1,5 +1,8 @@
 #include "packimg.h"
+#include "update_dev.h"
 #include "cJSON.h"
+
+int choose_to_pack(img_info *info);
 
 int cjson_parse_SubNode(cJSON *item, _info *info)
 {
@@ -142,6 +145,10 @@ int cjson_to_struct_array(const char *json_string, img_info *info)
         }
     }
 
+    choose_to_pack(info); //打包img
+
+    choose_to_unpack(info); //解包img
+
     cJSON_Delete(root);
 
     return 0;
@@ -200,51 +207,45 @@ int pack_img(const char *name, const unsigned int seek_len, const unsigned int l
     return 0;
 }
 
-int unpack_img(char *name, unsigned int len, unsigned int skip_len)
-{
-    char cmd[128];
-
-    sprintf(cmd, "dd if=test.bin of=%s bs=1k skip=%d count=%d", name, skip_len, len);
-
-    system(cmd);
-
-    return 0;
-}
-
-int calc_seek_len(const char *name, const img_info info)
+int calc_seek_len(const char *name, const img_info *info)
 {
     unsigned int len = 0;
     unsigned int seek_len = 0;
 
-    // printf("name:%s, len:%d\n", info.kernel_info->name, info->kernel_info->len);
+    // printf("name:%s, len:%d\n", info->kernel_info->name, info->kernel_info->len);
 
     if(strcmp(name, "uImage") == 0)
     {
-        len = info.kernel_info->len;
+        len = info->kernel_info->len;
 
         seek_len = 0;
     }
     else if(strcmp(name, "devicetree.dtb") == 0)
     {
-        len = info.dts_info->len;
+        len = info->dts_info->len;
 
-        seek_len = info.kernel_info->len;
+        seek_len = info->kernel_info->len;
     }
 
-    printf("len:%d, seek_len:%d\n", len, seek_len);
+    // printf("len:%d, seek_len:%d\n", len, seek_len);
 
     pack_img(name, seek_len, len);
 
     return 0;
 }
 
-int choose_to_pack(const img_info info)
+int choose_to_pack(img_info *info)
 {
-    if(info.kernel_info->len != 0)
+    // parse_info("./info.json", &info);
+
+    if(info->kernel_info->len != 0)
     {
         calc_seek_len("uImage", info);
     }
-    if(info.dts_info->len != 0)
+
+    // parse_info("./info.json", &info);
+
+    if(info->dts_info->len != 0)
     {
         calc_seek_len("devicetree.dtb", info);
     }
@@ -291,7 +292,13 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    choose_to_pack(info);
+    // printf("name:%s, len:%d\n", info.kernel_info->name, info.kernel_info->len);
+
+    // printf("name:%s, len:%d\n", info.dts_info->name, info.dts_info->len);
+
+    // choose_to_pack(info);
+
+    // choose_to_unpack(info);
 
     return 0;
 }
